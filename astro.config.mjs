@@ -7,8 +7,6 @@ import path from 'path';
 
 // https://astro.build/config
 export default defineConfig({
-  // srcDir points to frontend/ — pages, layouts, components all live here
-  // backend/, shared/, templates/ are outside Astro's src and accessed via tsconfig paths
   srcDir: './frontend',
   output: 'server',
   adapter: cloudflare(),
