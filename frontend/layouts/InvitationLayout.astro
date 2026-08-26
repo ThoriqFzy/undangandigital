@@ -1,0 +1,29 @@
+---
+/**
+ * InvitationLayout — Shell for public invitation
+ * Constrained canvas, mobile-first, theme-aware.
+ */
+
+import BaseLayout from './BaseLayout.astro';
+import type { InvitationPublicVM } from '../../backend/viewmodels/types';
+import { themeToCSSVars, defaultClassicTheme } from '../../templates/classic/theme-config';
+
+interface Props {
+  invitation: InvitationPublicVM;
+}
+
+const { invitation } = Astro.props;
+const cssVars = themeToCSSVars({});
+---
+
+<BaseLayout
+  title={invitation.title || `${invitation.couple?.groomName || 'Mempelai'} & ${invitation.couple?.brideName || 'Mempelai'}`}
+  description={`Undangan pernikahan ${invitation.couple?.groomName || ''} & ${invitation.couple?.brideName || ''}`}
+>
+  <div
+    class="invitation-shell"
+    style={Object.entries(cssVars).map(([k, v]) => `${k}:${v}`).join(';')}
+  >
+    <slot />
+  </div>
+</BaseLayout>

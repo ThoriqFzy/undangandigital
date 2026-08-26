@@ -1,0 +1,106 @@
+---
+/**
+ * GUESTS MANAGEMENT — List, search, import
+ */
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import { db } from '@db/client';
+import { guests, invitations } from '@db/index';
+import { eq, isNull, desc } from 'drizzle-orm';
+
+const allGuests = await db
+  .select({
+    id: guests.id,
+    name: guests.name,
+    phone: guests.phone,
+    email: guests.email,
+    guestGroup: guests.guestGroup,
+    maxGuestCount: guests.maxGuestCount,
+    status: guests.status,
+    viewCount: guests.viewCount,
+    invitationSlug: invitations.slug,
+  })
+  .from(guests)
+  .leftJoin(invitations, eq(guests.invitationId, invitations.id))
+  .where(isNull(guests.deletedAt))
+  .orderBy(desc(guests.createdAt));
+
+const statusColors: Record<string, string> = {
+  invited: 'bg-blue-100 text-blue-700',
+  viewed: 'bg-amber-100 text-amber-700',
+  responded: 'bg-green-100 text-green-700',
+  attended: 'bg-purple-100 text-purple-700',
+};
+
+const statusLabels: Record<string, string> = {
+  invited: 'Diundang',
+  viewed: 'Dilihat',
+  responded: 'Dijawab',
+  attended: 'Hadir',
+};
+---
+
+<AdminLayout title="Tamu" activePage="guests">
+  <PageHeader
+    title="Daftar Tamu"
+    subtitle={`${allGuests.length} tamu terdaftar`}
+    actionLabel="Tambah Tamu"
+    actionHref="/admin/guests/new"
+  />
+
+  {allGuests.length === 0 ? (
+    <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-16">
+      <p class="text-sm font-medium text-gray-900">Belum ada tamu</p>
+      <p class="mt-1 text-xs text-gray-500">Tambah tamu satu per satu atau import dari CSV</p>
+      <div class="mt-4 flex gap-2">
+        <a href="/admin/guests/new" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+          Tambah Tamu
+        </a>
+        <a href="/admin/guests/import" class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+          Import CSV
+        </a>
+      </div>
+    </div>
+  ) : (
+    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Nama</th>
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Grup</th>
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Max Tamu</th>
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Views</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {allGuests.map(guest => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3">
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">{guest.name}</p>
+                    {guest.phone && <p class="text-xs text-gray-500">{guest.phone}</p>}
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-600">{guest.guestGroup || '-'}</td>
+                <td class="px-4 py-3">
+                  <span class={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[guest.status]}`}>
+                    {statusLabels[guest.status]}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-600">{guest.maxGuestCount}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{guest.viewCount}</td>
+                <td class="px-4 py-3 text-right">
+                  <a href={`/admin/guests/${guest.id}`} class="text-xs font-medium text-indigo-600 hover:text-indigo-700">Edit</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )}
+</AdminLayout>

@@ -1,0 +1,183 @@
+---
+/**
+ * PUBLIC INVITATION PAGE
+ * /:slug — Renders a published invitation.
+ */
+
+import InvitationLayout from '../layouts/InvitationLayout.astro';
+import Cover from '../components/invitation/Cover.astro';
+import Quote from '../components/invitation/Quote.astro';
+import Couple from '../components/invitation/Couple.astro';
+import Countdown from '../components/invitation/Countdown.tsx';
+import Events from '../components/invitation/Events.astro';
+import Story from '../components/invitation/Story.astro';
+import Gallery from '../components/invitation/Gallery.tsx';
+import Gift from '../components/invitation/Gift.astro';
+import RSVP from '../components/invitation/RSVP.tsx';
+import Wishes from '../components/invitation/Wishes.tsx';
+import Closing from '../components/invitation/Closing.astro';
+
+import { invitationService } from '@services/invitation.service';
+import { coupleRepository } from '@repos/couple.repository';
+import { eventRepository } from '@repos/event.repository';
+import { storyRepository } from '@repos/story.repository';
+import { giftRepository } from '@repos/gift.repository';
+import { wishRepository } from '@repos/wish.repository';
+import { galleryRepository } from '@repos/gallery.repository';
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/');
+}
+
+let invitation;
+try {
+  invitation = await invitationService.getPublicBySlug(slug);
+} catch {
+  return Astro.redirect('/');
+}
+
+// Fetch related data
+const [couple, events, stories, gifts, wishes, galleryItems] = await Promise.all([
+  coupleRepository.findByInvitationId(invitation.id),
+  eventRepository.findVisible(invitation.id),
+  storyRepository.findVisible(invitation.id),
+  giftRepository.findVisible(invitation.id),
+  wishRepository.findApproved(invitation.id),
+  galleryRepository.findVisible(invitation.id),
+]);
+
+// Extract guest info from URL params
+const guestName = Astro.url.searchParams.get('name') || undefined;
+const guestId = Astro.url.searchParams.get('guest') || undefined;
+
+// Get first event date for countdown
+const firstEventDate = events.length > 0 ? events[0].eventDate : new Date().toISOString().split('T')[0];
+
+// Settings
+const settings = (invitation.settings || {}) as Record<string, unknown>;
+---
+
+<InvitationLayout invitation={{
+  slug: invitation.slug,
+  title: invitation.title,
+  template: { slug: 'classic', name: 'Classic', config: {} },
+  theme: { config: {} as any },
+  couple: couple ? {
+    groomName: couple.groomName,
+    groomNickname: couple.groomNickname,
+    groomPhotoUrl: null,
+    groomFatherName: couple.groomFatherName,
+    groomMotherName: couple.groomMotherName,
+    brideName: couple.brideName,
+    brideNickname: couple.brideNickname,
+    bridePhotoUrl: null,
+    brideFatherName: couple.brideFatherName,
+    brideMotherName: couple.brideMotherName,
+  } : null,
+  events: events.map(e => ({
+    type: e.type, title: e.title, eventDate: e.eventDate,
+    startTime: e.startTime, endTime: e.endTime, timezone: e.timezone,
+    venueName: e.venueName, address: e.address, mapsUrl: e.mapsUrl,
+  })),
+  stories: [],
+  gallery: [],
+  gifts: [],
+  wishes: [],
+  settings: { music: { enabled: false }, showCountdown: true, showStory: true, showGallery: true, showGift: true, showRsvp: true, showWishes: true },
+}}>
+  {/* COVER */}
+  <Cover
+    groomName={couple?.groomName || 'Mempelai Pria'}
+    brideName={couple?.brideName || 'Mempelai Wanita'}
+    weddingDate={firstEventDate}
+    guestName={guestName}
+    title={invitation.title}
+  />
+
+  {/* QUOTE */}
+  <Quote />
+
+  {/* COUPLE */}
+  <Couple
+    groomName={couple?.groomName || 'Mempelai Pria'}
+    groomNickname={couple?.groomNickname}
+    groomFatherName={couple?.groomFatherName}
+    groomMotherName={couple?.groomMotherName}
+    brideName={couple?.brideName || 'Mempelai Wanita'}
+    brideNickname={couple?.brideNickname}
+    brideFatherName={couple?.brideFatherName}
+    brideMotherName={couple?.brideMotherName}
+  />
+
+  {/* COUNTDOWN */}
+  <Countdown
+    client:load
+    targetDate={firstEventDate}
+    timezone="Asia/Jakarta"
+  />
+
+  {/* EVENTS */}
+  {events.length > 0 && (
+    <Events events={events.map(e => ({
+      type: e.type, title: e.title, eventDate: e.eventDate,
+      startTime: e.startTime, endTime: e.endTime, timezone: e.timezone,
+      venueName: e.venueName, address: e.address, mapsUrl: e.mapsUrl,
+    }))} />
+  )}
+
+  {/* STORY */}
+  {stories.length > 0 && (
+    <Story stories={stories.map(s => ({
+      yearLabel: s.yearLabel, title: s.title, description: s.description, imageUrl: null,
+    }))} />
+  )}
+
+  {/* GALLERY */}
+  {galleryItems.length > 0 && (
+    <Gallery client:load images={galleryItems.map(g => ({
+      imageUrl: '', thumbUrl: '', caption: g.caption, altText: g.altText,
+    }))} />
+  )}
+
+  {/* GIFT */}
+  {gifts.length > 0 && (
+    <Gift gifts={gifts.map(g => ({
+      type: g.type, label: g.label, bankName: g.bankName, accountNumber: g.accountNumber,
+      accountHolder: g.accountHolder, ewalletProvider: g.ewalletProvider, ewalletNumber: g.ewalletNumber,
+      recipientName: g.recipientName, address: g.address, instructions: g.instructions,
+    }))} />
+  )}
+
+  {/* RSVP */}
+  <RSVP
+    client:load
+    invitationSlug={invitation.slug}
+    guestName={guestName}
+    guestId={guestId}
+    maxGuestCount={5}
+  />
+
+  {/* WISHES */}
+  <Wishes
+    client:load
+    invitationSlug={invitation.slug}
+    guestName={guestName}
+    initialWishes={wishes.map(w => ({
+      name: w.name,
+      message: w.message,
+      createdAt: w.createdAt.toISOString(),
+    }))}
+  />
+
+  {/* CLOSING */}
+  <Closing
+    groomName={couple?.groomName || ''}
+    brideName={couple?.brideName || ''}
+  />
+</InvitationLayout>
+
+<style is:global>
+  @import '../styles/invitation.css';
+</style>

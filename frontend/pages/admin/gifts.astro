@@ -1,0 +1,62 @@
+---
+/**
+ * GIFTS MANAGEMENT — Payment accounts
+ */
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import { db } from '@db/client';
+import { gifts, invitations } from '@db/index';
+import { eq, asc } from 'drizzle-orm';
+
+const allGifts = await db
+  .select({
+    id: gifts.id,
+    type: gifts.type,
+    label: gifts.label,
+    bankName: gifts.bankName,
+    accountNumber: gifts.accountNumber,
+    accountHolder: gifts.accountHolder,
+    ewalletProvider: gifts.ewalletProvider,
+    invitationSlug: invitations.slug,
+    invitationTitle: invitations.title,
+  })
+  .from(gifts)
+  .leftJoin(invitations, eq(gifts.invitationId, invitations.id))
+  .orderBy(asc(gifts.sortOrder));
+
+const typeLabels: Record<string, string> = {
+  bank: '🏦 Bank',
+  ewallet: '📱 E-Wallet',
+  address: '📍 Alamat',
+  other: '🎁 Lainnya',
+};
+---
+
+<AdminLayout title="Hadiah" activePage="gifts">
+  <PageHeader title="Hadiah & Rekening" subtitle={`${allGifts.length} akun tercatat`} />
+
+  {allGifts.length === 0 ? (
+    <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-16">
+      <p class="text-sm font-medium text-gray-900">Belum ada data hadiah</p>
+    </div>
+  ) : (
+    <div class="space-y-3">
+      {allGifts.map(gift => (
+        <div class="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div class="flex items-center gap-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-50 text-lg">
+              {gift.type === 'bank' ? '🏦' : gift.type === 'ewallet' ? '📱' : '🎁'}
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-900">{gift.label || typeLabels[gift.type] || gift.type}</p>
+              {gift.bankName && <p class="text-xs text-gray-500">{gift.bankName} · {gift.accountNumber}</p>}
+              {gift.accountHolder && <p class="text-xs text-gray-500">a.n. {gift.accountHolder}</p>}
+            </div>
+          </div>
+          <span class="text-xs text-gray-400">{gift.invitationTitle || gift.invitationSlug}</span>
+        </div>
+      ))}
+    </div>
+  )}
+</AdminLayout>

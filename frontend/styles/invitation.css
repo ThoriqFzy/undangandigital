@@ -1,0 +1,115 @@
+/**
+ * INVITATION BASE STYLES
+ * Shared across all template sections.
+ */
+
+/* Constrained canvas */
+.invitation-shell {
+  margin: 0 auto;
+  max-width: var(--container-max-width, 480px);
+  min-height: 100dvh;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+/* Section base */
+.invitation-section {
+  padding: var(--section-padding, 3rem 1.25rem);
+}
+
+/* Scroll-based animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.invitation-section > * {
+  animation: fade-in-up 0.6s ease-out both;
+}
+
+/* Stagger children */
+.invitation-section > *:nth-child(1) { animation-delay: 0s; }
+.invitation-section > *:nth-child(2) { animation-delay: 0.1s; }
+.invitation-section > *:nth-child(3) { animation-delay: 0.2s; }
+.invitation-section > *:nth-child(4) { animation-delay: 0.3s; }
+
+/* Card base */
+.invitation-card {
+  border-radius: var(--radius-card, 1rem);
+  border: 1px solid var(--color-border-soft);
+  background: var(--color-surface);
+  padding: var(--card-padding, 1.5rem);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Button base */
+.invitation-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-button, 9999px);
+  padding: 0.875rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.invitation-btn-primary {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(74, 111, 165, 0.25);
+}
+
+.invitation-btn-primary:hover {
+  background: var(--color-primary-dark);
+  box-shadow: 0 4px 12px rgba(74, 111, 165, 0.35);
+}
+
+/* Input base */
+.invitation-input {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  transition: border-color 0.2s;
+}
+
+.invitation-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.15);
+}
+
+/* Divider */
+.invitation-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.invitation-divider::before,
+.invitation-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* Safe area padding for mobile */
+@media (max-width: 480px) {
+  .invitation-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

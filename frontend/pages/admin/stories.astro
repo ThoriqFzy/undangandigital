@@ -1,0 +1,59 @@
+---
+/**
+ * STORIES MANAGEMENT — Love story timeline
+ */
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import { db } from '@db/client';
+import { stories, invitations } from '@db/index';
+import { eq, asc } from 'drizzle-orm';
+
+const allStories = await db
+  .select({
+    id: stories.id,
+    yearLabel: stories.yearLabel,
+    title: stories.title,
+    description: stories.description,
+    sortOrder: stories.sortOrder,
+    isVisible: stories.isVisible,
+    invitationSlug: invitations.slug,
+    invitationTitle: invitations.title,
+  })
+  .from(stories)
+  .leftJoin(invitations, eq(stories.invitationId, invitations.id))
+  .orderBy(asc(stories.sortOrder));
+---
+
+<AdminLayout title="Cerita Cinta" activePage="stories">
+  <PageHeader title="Love Story" subtitle={`${allStories.length} cerita tercatat`} />
+
+  {allStories.length === 0 ? (
+    <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-16">
+      <p class="text-sm font-medium text-gray-900">Belum ada cerita</p>
+    </div>
+  ) : (
+    <div class="space-y-3">
+      {allStories.map(story => (
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                {story.yearLabel && (
+                  <span class="inline-flex items-center rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                    {story.yearLabel}
+                  </span>
+                )}
+                <h3 class="text-sm font-medium text-gray-900">{story.title}</h3>
+              </div>
+              {story.description && (
+                <p class="mt-1 text-sm text-gray-600 line-clamp-2">{story.description}</p>
+              )}
+            </div>
+            <span class="text-xs text-gray-400">{story.invitationTitle || story.invitationSlug}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</AdminLayout>

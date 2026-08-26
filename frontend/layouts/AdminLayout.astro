@@ -1,0 +1,142 @@
+---
+/**
+ * ADMIN LAYOUT
+ * Shell for all admin dashboard pages.
+ * Sidebar + header + main content area.
+ */
+
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  activePage?: string;
+}
+
+const { title, activePage = '' } = Astro.props;
+
+const navItems = [
+  { href: '/admin', label: 'Dashboard', icon: 'home', id: 'dashboard' },
+  { href: '/admin/invitations', label: 'Undangan', icon: 'mail', id: 'invitations' },
+  { href: '/admin/guests', label: 'Tamu', icon: 'users', id: 'guests' },
+  { href: '/admin/rsvp', label: 'RSVP', icon: 'check', id: 'rsvp' },
+  { href: '/admin/wishes', label: 'Ucapan', icon: 'heart', id: 'wishes' },
+  { href: '/admin/events', label: 'Acara', icon: 'calendar', id: 'events' },
+  { href: '/admin/stories', label: 'Cerita', icon: 'book', id: 'stories' },
+  { href: '/admin/gifts', label: 'Hadiah', icon: 'gift', id: 'gifts' },
+  { href: '/admin/theme', label: 'Tema', icon: 'palette', id: 'theme' },
+  { href: '/admin/settings', label: 'Pengaturan', icon: 'gear', id: 'settings' },
+];
+---
+
+<BaseLayout title={`${title} — Admin`}>
+  <div class="admin-shell flex min-h-dvh bg-gray-50">
+    {/* Sidebar — desktop */}
+    <aside class="admin-sidebar fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-gray-200 bg-white md:flex">
+      {/* Logo */}
+      <div class="flex h-16 items-center gap-2 border-b border-gray-100 px-6">
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">W</div>
+        <span class="text-sm font-semibold text-gray-900">Wedding Platform</span>
+      </div>
+
+      {/* Navigation */}
+      <nav class="flex-1 space-y-0.5 overflow-y-auto p-3">
+        {navItems.map(item => (
+          <a
+            href={item.href}
+            class={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              activePage === item.id
+                ? 'bg-indigo-50 text-indigo-700'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            }`}
+          >
+            <span class="h-4 w-4">{item.label.charAt(0)}</span>
+            {item.label}
+          </a>
+        ))}
+      </nav>
+
+      {/* User section */}
+      <div class="border-t border-gray-100 p-4">
+        <div class="flex items-center gap-3">
+          <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-xs font-medium text-gray-600">A</div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900 truncate">Admin</p>
+            <p class="text-xs text-gray-500 truncate">admin@wedding.com</p>
+          </div>
+          <button class="rounded-lg p-1 text-gray-400 hover:text-gray-600" title="Logout">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    {/* Mobile sidebar overlay */}
+    <div id="mobile-sidebar-overlay" class="fixed inset-0 z-30 hidden bg-black/50 md:hidden"></div>
+
+    {/* Mobile sidebar */}
+    <aside id="mobile-sidebar" class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-gray-200 bg-white transform -translate-x-full transition-transform md:hidden">
+      <div class="flex h-16 items-center justify-between border-b border-gray-100 px-6">
+        <span class="text-sm font-semibold text-gray-900">Wedding Platform</span>
+        <button id="close-sidebar" class="rounded-lg p-1 text-gray-400 hover:text-gray-600">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <nav class="flex-1 space-y-0.5 overflow-y-auto p-3">
+        {navItems.map(item => (
+          <a
+            href={item.href}
+            class={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              activePage === item.id
+                ? 'bg-indigo-50 text-indigo-700'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            }`}
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
+    </aside>
+
+    {/* Main content */}
+    <div class="flex-1 md:ml-64">
+      {/* Top header */}
+      <header class="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-gray-200 bg-white/80 px-4 backdrop-blur-sm md:px-6">
+        <button id="open-sidebar" class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 md:hidden">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+        </button>
+        <h1 class="text-lg font-semibold text-gray-900">{title}</h1>
+      </header>
+
+      {/* Page content */}
+      <main class="p-4 md:p-6">
+        <slot />
+      </main>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const openBtn = document.getElementById('open-sidebar');
+  const closeBtn = document.getElementById('close-sidebar');
+  const overlay = document.getElementById('mobile-sidebar-overlay');
+  const sidebar = document.getElementById('mobile-sidebar');
+
+  function openMobileSidebar() {
+    sidebar?.classList.remove('-translate-x-full');
+    overlay?.classList.remove('hidden');
+  }
+  function closeMobileSidebar() {
+    sidebar?.classList.add('-translate-x-full');
+    overlay?.classList.add('hidden');
+  }
+
+  openBtn?.addEventListener('click', openMobileSidebar);
+  closeBtn?.addEventListener('click', closeMobileSidebar);
+  overlay?.addEventListener('click', closeMobileSidebar);
+</script>

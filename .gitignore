@@ -1,0 +1,43 @@
+# ========================================
+# Git Ignore — Wedding Platform
+# ========================================
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Build output
+dist/
+.wrangler/
+
+# Astro
+.astro/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+drizzle/migrations/*.sql
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# Temporary
+tmp/
+*.tmp
+.wrangler/

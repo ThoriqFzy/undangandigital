@@ -1,0 +1,86 @@
+---
+/**
+ * GALLERY MANAGEMENT — Upload + manage gallery images
+ */
+
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import MediaUpload from '../../../../components/admin/MediaUpload.tsx';
+import { db } from '@db/client';
+import { galleryItems, assets, invitations } from '@db/index';
+import { eq, asc } from 'drizzle-orm';
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect('/admin/invitations');
+
+const invitation = await db.query.invitations.findFirst({
+  where: eq(invitations.id, id),
+  columns: { id: true, slug: true, title: true },
+});
+
+if (!invitation) return Astro.redirect('/admin/invitations');
+
+const items = await db
+  .select({
+    id: galleryItems.id,
+    caption: galleryItems.caption,
+    altText: galleryItems.altText,
+    sortOrder: galleryItems.sortOrder,
+    isVisible: galleryItems.isVisible,
+    assetId: galleryItems.assetId,
+    objectKey: assets.objectKey,
+    mimeType: assets.mimeType,
+  })
+  .from(galleryItems)
+  .leftJoin(assets, eq(galleryItems.assetId, assets.id))
+  .where(eq(galleryItems.invitationId, id))
+  .orderBy(asc(galleryItems.sortOrder));
+---
+
+<AdminLayout title={`Galeri: ${invitation.title || invitation.slug}`} activePage="invitations">
+  <div class="space-y-6">
+    {/* Back link */}
+    <a href={`/admin/invitations/${id}`} class="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+      </svg>
+      Kembali ke undangan
+    </a>
+
+    <h2 class="text-xl font-bold text-gray-900">Galeri Foto</h2>
+
+    {/* Upload area */}
+    <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      <h3 class="mb-4 text-sm font-semibold text-gray-900">Upload Foto</h3>
+      <MediaUpload
+        client:load
+        invitationId={id}
+        folder="gallery"
+        multiple={true}
+      />
+    </div>
+
+    {/* Existing gallery items */}
+    {items.length > 0 && (
+      <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h3 class="mb-4 text-sm font-semibold text-gray-900">{items.length} Foto dalam Galeri</h3>
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {items.map(item => (
+            <div class="group relative overflow-hidden rounded-lg border border-gray-200">
+              {item.objectKey && (
+                <img
+                  src={`https://wedding-assets.7b26172684c33525f7b82045f20893e0.r2.dev/${item.objectKey}`}
+                  alt={item.altText || item.caption || 'Gallery'}
+                  class="aspect-square w-full object-cover"
+                  loading="lazy"
+                />
+              )}
+              <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
+                <p class="text-xs text-white truncate">{item.caption || 'No caption'}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</AdminLayout>

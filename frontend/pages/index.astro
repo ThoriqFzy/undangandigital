@@ -1,0 +1,25 @@
+---
+/**
+ * Index Page — Landing / platform home
+ * MVP: minimal landing page
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Wedding Invitation Platform">
+  <main class="invitation-shell mx-auto flex min-h-dvh items-center justify-center p-6">
+    <div class="text-center">
+      <p class="mb-2 font-[family-name:var(--font-accent)] text-3xl text-primary">Wedding Platform</p>
+      <h1 class="mb-4 font-[family-name:var(--font-display)] text-4xl font-semibold text-text">
+        Undangan Pernikahan Digital
+      </h1>
+      <p class="mb-8 text-base text-text-muted">
+        Platform untuk membuat undangan pernikahan digital yang elegan dan interaktif.
+      </p>
+      <a href="/admin" class="btn btn-primary">
+        Buka Dashboard
+      </a>
+    </div>
+  </main>
+</BaseLayout>

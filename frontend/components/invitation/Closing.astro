@@ -1,0 +1,61 @@
+---
+/**
+ * CLOSING SECTION
+ * Source: REFERENCE.md Section 22
+ */
+
+interface Props {
+  groomName: string;
+  brideName: string;
+  groomParents?: string;
+  brideParents?: string;
+}
+
+const { groomName, brideName, groomParents, brideParents } = Astro.props;
+---
+
+<section id="closing" class="invitation-section bg-[var(--color-background)]">
+  <div class="mx-auto max-w-sm text-center space-y-6">
+    {/* Decorative */}
+    <div class="flex items-center justify-center gap-3">
+      <div class="h-px w-12 bg-[var(--color-accent)]"></div>
+      <svg class="h-5 w-5 text-[var(--color-accent)]" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+      <div class="h-px w-12 bg-[var(--color-accent)]"></div>
+    </div>
+
+    {/* Thank you */}
+    <h2 class="font-[family-name:var(--font-heading)] text-2xl font-semibold text-[var(--color-text)]">
+      Terima Kasih
+    </h2>
+
+    <p class="text-sm leading-relaxed text-[var(--color-text-muted)]">
+      Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu kepada kami.
+    </p>
+
+    {/* Family names */}
+    <div class="space-y-2 pt-2">
+      <p class="font-[family-name:var(--font-heading)] text-base font-medium text-[var(--color-text)]">
+        Keluarga Besar
+      </p>
+      {(groomParents || brideParents) && (
+        <p class="text-sm text-[var(--color-text-muted)]">
+          {groomParents || `Keluarga ${groomName}`} & {brideParents || `Keluarga ${brideName}`}
+        </p>
+      )}
+    </div>
+
+    {/* Wassalam */}
+    <p class="font-[family-name:var(--font-accent)] text-lg text-[var(--color-accent)]">
+      Wassalamu'alaikum Warahmatullahi Wabarakatuh
+    </p>
+
+    {/* Decorative bottom */}
+    <div class="pt-8 pb-4">
+      <svg width="120" height="60" viewBox="0 0 120 60" fill="none" class="mx-auto opacity-20">
+        <path d="M60 5 C40 5 15 25 5 45 C15 30 35 18 60 18 C85 18 105 30 115 45 C105 25 80 5 60 5Z" fill="currentColor" class="text-[var(--color-primary)]"/>
+      </svg>
+    </div>
+  </div>
+</section>

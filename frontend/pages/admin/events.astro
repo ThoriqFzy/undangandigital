@@ -1,0 +1,64 @@
+---
+/**
+ * EVENTS MANAGEMENT — List all events across invitations
+ */
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import { db } from '@db/client';
+import { events, invitations } from '@db/index';
+import { eq, asc } from 'drizzle-orm';
+
+const allEvents = await db
+  .select({
+    id: events.id,
+    type: events.type,
+    title: events.title,
+    eventDate: events.eventDate,
+    startTime: events.startTime,
+    venueName: events.venueName,
+    invitationSlug: invitations.slug,
+    invitationTitle: invitations.title,
+  })
+  .from(events)
+  .leftJoin(invitations, eq(events.invitationId, invitations.id))
+  .orderBy(asc(events.eventDate));
+
+const typeLabels: Record<string, string> = {
+  akad: '💍 Akad',
+  reception: '🥂 Resepsi',
+  other: '🎉 Lainnya',
+};
+---
+
+<AdminLayout title="Acara" activePage="events">
+  <PageHeader title="Daftar Acara" subtitle={`${allEvents.length} acara tercatat`} />
+
+  {allEvents.length === 0 ? (
+    <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 py-16">
+      <p class="text-sm font-medium text-gray-900">Belum ada acara</p>
+      <p class="text-xs text-gray-500">Acara ditambahkan melalui halaman undangan</p>
+    </div>
+  ) : (
+    <div class="space-y-3">
+      {allEvents.map(event => (
+        <div class="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div class="flex items-center gap-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-lg">
+              {event.type === 'akad' ? '💍' : event.type === 'reception' ? '🥂' : '🎉'}
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-900">{event.title}</p>
+              <p class="text-xs text-gray-500">
+                {new Date(event.eventDate).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                {event.startTime ? ` · ${event.startTime} WIB` : ''}
+              </p>
+              {event.venueName && <p class="text-xs text-gray-500">{event.venueName}</p>}
+            </div>
+          </div>
+          <span class="text-xs text-gray-400">{event.invitationTitle || event.invitationSlug}</span>
+        </div>
+      ))}
+    </div>
+  )}
+</AdminLayout>
