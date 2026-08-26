@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/postbuild.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "db:generate": "drizzle-kit generate",
@@ -20,7 +20,8 @@
     "typecheck": "tsc --noEmit",
     "deploy": "wrangler pages deploy dist/ --project-name=wedding-platform",
     "deploy:preview": "wrangler pages deploy dist/ --project-name=wedding-platform --branch=preview",
-    "setup-env": "bash scripts/setup-env.sh"
+    "setup-env": "bash scripts/setup-env.sh",
+    "pages:deploy": "npm run build && CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN} wrangler pages deploy dist/client --project-name=wedding-platform --branch=main"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.2.5",
