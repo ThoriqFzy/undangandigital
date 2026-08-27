@@ -1,7 +1,8 @@
 ---
 // Legacy root-slug redirect: invitations now live at /m/:slug (SaaS separation).
 // Redirect old /:slug links to the new location so nothing breaks.
-
 const slug = Astro.params.slug;
-if (!slug) return Astro.redirect("/");
-return Astro.redirect(`/m/${slug}`);
+if (!slug) {
+  return new Response(null, { status: 302, headers: { location: "/" } });
+}
+return new Response(null, { status: 302, headers: { location: `/m/${slug}` } });
