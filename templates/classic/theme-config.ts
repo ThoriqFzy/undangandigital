@@ -6,6 +6,8 @@
  * Theme overrides from invitation.themeOverrides take highest priority.
  */
 
+import type { ThemeConfig } from "../../shared/types/invitation";
+
 export interface ClassicThemeConfig {
   colors: {
     primary: string;
@@ -85,34 +87,44 @@ export const defaultClassicTheme: ClassicThemeConfig = {
 };
 
 /**
- * Convert theme config to CSS custom properties string.
- * Injected as inline style on the invitation shell.
+ * Convert a DB-backed ThemeConfig (from themes.config JSONB) into CSS custom
+ * properties. Missing fields fall back to the classic defaults so partial configs
+ * still render correctly.
  */
-export function themeToCSSVars(theme: Partial<ClassicThemeConfig>): Record<string, string> {
+export function themeConfigToCSSVars(theme: Partial<ThemeConfig> | undefined | null): Record<string, string> {
   const base = defaultClassicTheme;
-  const t = { ...base, ...theme };
+  const c = (theme?.colors ?? {}) as Record<string, string>;
+  const t = (theme?.typography ?? {}) as Record<string, string>;
+  const b = (theme?.buttons ?? {}) as Record<string, string>;
+
+  const primary = c.primary || base.colors.primary;
+  const secondary = c.secondary || base.colors.secondary;
+  const background = c.background || base.colors.background;
+  const surface = c.surface || base.colors.surface;
+  const text = c.text || base.colors.text;
+  const accent = c.accent || secondary;
 
   return {
-    '--color-primary': t.colors.primary,
-    '--color-primary-soft': t.colors.primarySoft,
-    '--color-primary-dark': t.colors.primaryDark,
-    '--color-secondary': t.colors.secondary,
-    '--color-accent': t.colors.accent,
-    '--color-accent-soft': t.colors.accentSoft,
-    '--color-background': t.colors.background,
-    '--color-surface': t.colors.surface,
-    '--color-surface-soft': t.colors.surfaceSoft,
-    '--color-text': t.colors.text,
-    '--color-text-muted': t.colors.textMuted,
-    '--color-text-light': t.colors.textLight,
-    '--color-border': t.colors.border,
-    '--color-border-soft': t.colors.borderSoft,
-    '--font-display': t.typography.display,
-    '--font-heading': t.typography.heading,
-    '--font-body': t.typography.body,
-    '--font-accent': t.typography.accent,
-    '--radius-card': t.radius.card,
-    '--radius-button': t.radius.button,
-    '--radius-image': t.radius.image,
+    "--color-primary": primary,
+    "--color-primary-soft": c.primarySoft || secondary,
+    "--color-primary-dark": c.primaryDark || primary,
+    "--color-secondary": secondary,
+    "--color-accent": accent,
+    "--color-accent-soft": c.accentSoft || surface,
+    "--color-background": background,
+    "--color-surface": surface,
+    "--color-surface-soft": c.surfaceSoft || surface,
+    "--color-text": text,
+    "--color-text-muted": c.textMuted || base.colors.textMuted,
+    "--color-text-light": c.textLight || base.colors.textLight,
+    "--color-border": c.border || base.colors.border,
+    "--color-border-soft": c.borderSoft || base.colors.borderSoft,
+    "--font-display": t.display || base.typography.display,
+    "--font-heading": t.heading || base.typography.heading,
+    "--font-body": t.body || base.typography.body,
+    "--font-accent": t.accent || base.typography.accent,
+    "--radius-card": base.radius.card,
+    "--radius-button": b.radius || base.radius.button,
+    "--radius-image": base.radius.image,
   };
 }
