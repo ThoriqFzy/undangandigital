@@ -15,15 +15,15 @@ export const slugSchema = z
 // Invitation settings
 export const invitationSettingsSchema = z.object({
   music: z.object({
-    enabled: z.boolean().default(false),
+    enabled: z.boolean().optional(),
     assetId: z.string().uuid().optional(),
-  }).default({ enabled: false }),
-  showCountdown: z.boolean().default(true),
-  showStory: z.boolean().default(true),
-  showGallery: z.boolean().default(true),
-  showGift: z.boolean().default(true),
-  showRsvp: z.boolean().default(true),
-  showWishes: z.boolean().default(true),
+  }).optional(),
+  showCountdown: z.boolean().optional(),
+  showStory: z.boolean().optional(),
+  showGallery: z.boolean().optional(),
+  showGift: z.boolean().optional(),
+  showRsvp: z.boolean().optional(),
+  showWishes: z.boolean().optional(),
 });
 
 // Create invitation

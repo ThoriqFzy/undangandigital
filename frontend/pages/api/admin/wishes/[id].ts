@@ -27,7 +27,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ params }) => {
+export const DELETE: APIRoute = async ({ params, request }) => {
   try {
     if (!params.id) return errorResponse('VALIDATION_ERROR', 'ID wajib diisi', 400);
     await wishService.delete(params.id, await getAdminUserId(request));

@@ -126,7 +126,7 @@ export const invitationRepository = {
       isNull(invitations.deletedAt),
     ];
     if (excludeId) {
-      conditions.push(/* not eq(invitations.id, excludeId) */);
+      conditions.push(ne(invitations.id, excludeId));
     }
     const rows = await db
       .select({ id: invitations.id })

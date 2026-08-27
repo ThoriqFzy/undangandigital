@@ -11,6 +11,7 @@ import { invitationService } from '@services/invitation.service';
 import { buildPublicViewModel } from '@backend/viewmodels/invitation-public.vm';
 import { successResponse, errorResponse } from '@lib/response';
 import { AppError } from '@lib/errors';
+import type { Invitation, InvitationSettings } from '@shared/types/invitation';
 
 export const GET: APIRoute = async ({ params }) => {
   try {
@@ -20,7 +21,8 @@ export const GET: APIRoute = async ({ params }) => {
     }
 
     const invitation = await invitationService.getPublicBySlug(slug);
-    const viewModel = await buildPublicViewModel(invitation);
+    const safeInvitation = { ...(invitation as unknown as Record<string, unknown>), settings: (invitation.settings ?? {}) as unknown as InvitationSettings } as unknown as Invitation;
+    const viewModel = await buildPublicViewModel(safeInvitation);
 
     return successResponse(viewModel);
   } catch (error) {

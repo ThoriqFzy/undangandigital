@@ -17,8 +17,8 @@ export const POST: APIRoute = async ({ params, request }) => {
     if (!slug) return errorResponse('VALIDATION_ERROR', 'Slug wajib diisi', 400);
 
     // Rate limit: 5 wishes per IP per minute
-    const ip = request.headers.get('x-forwarded-for') || 'unknown';
-    const rl = checkRateLimit(`wish:${ip}`, { windowMs: 60000, maxRequests: 5 });
+    const ip = (request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown');
+    const rl = await checkRateLimit(`wish:${ip}`, { windowMs: 60000, maxRequests: 5 });
     if (!rl.allowed) {
       return errorResponse('RATE_LIMITED', 'Terlalu banyak request, coba lagi nanti', 429);
     }

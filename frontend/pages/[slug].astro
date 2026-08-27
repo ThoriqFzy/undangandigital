@@ -63,7 +63,7 @@ const settings = (invitation.settings || {}) as Record<string, unknown>;
   slug: invitation.slug,
   title: invitation.title,
   template: { slug: 'classic', name: 'Classic', config: {} },
-  theme: { config: {} as any },
+  theme: { config: (invitation.theme && invitation.theme.config) ? invitation.theme.config : ({} as any) },
   couple: couple ? {
     groomName: couple.groomName,
     groomNickname: couple.groomNickname,

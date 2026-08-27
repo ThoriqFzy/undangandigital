@@ -109,16 +109,23 @@ export const uploadService = {
 
   /**
    * Delete a file and its asset record.
+   * Order: soft-delete DB first (so a failed R2 delete leaves a recoverable record),
+   * then remove the R2 object. If R2 deletion fails we still return success but log,
+   * because the DB row is already hidden from clients.
    */
   async deleteAsset(assetId: string): Promise<void> {
     const asset = await assetRepository.findById(assetId);
     if (!asset) return;
 
-    // Delete from R2
-    await R2.delete(asset.objectKey);
-
-    // Soft delete record
+    // Soft delete DB record first (clients can no longer see it).
     await assetRepository.softDelete(assetId);
+
+    // Best-effort R2 cleanup.
+    try {
+      await R2.delete(asset.objectKey);
+    } catch (err) {
+      console.error("R2 delete failed for", asset.objectKey, err);
+    }
   },
 
   /**

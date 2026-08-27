@@ -29,7 +29,7 @@ export const rsvpService = {
       invitationId: invitation.id,
       guestId: input.guestId,
       status: input.status,
-      guestCount: input.guestCount,
+      guestCount: input.guestCount ?? 1,
       message: input.message,
     });
 

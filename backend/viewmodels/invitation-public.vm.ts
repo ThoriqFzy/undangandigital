@@ -12,6 +12,7 @@ import { storyRepository } from '../repositories/story.repository';
 import { galleryRepository } from '../repositories/gallery.repository';
 import { giftRepository } from '../repositories/gift.repository';
 import { wishRepository } from '../repositories/wish.repository';
+import { themeRepository } from '../repositories/theme.repository';
 import type { Invitation, ThemeConfig } from '../../shared/types/invitation';
 
 export async function buildPublicViewModel(invitation: Invitation): Promise<InvitationPublicVM> {
@@ -24,9 +25,14 @@ export async function buildPublicViewModel(invitation: Invitation): Promise<Invi
     wishRepository.findApproved(invitation.id),
   ]);
 
-  const themeConfig = (invitation.themeOverrides && Object.keys(invitation.themeOverrides).length > 0)
-    ? { ...((await import('../repositories/theme.repository')).themeRepository.findById(invitation.themeId).then(t => t?.config as ThemeConfig ?? {} as ThemeConfig)), ...invitation.themeOverrides }
-    : {} as ThemeConfig;
+  let themeConfig: ThemeConfig = { } as ThemeConfig;
+  if (invitation.themeId) {
+    const preset = await themeRepository.findById(invitation.themeId);
+    const baseConfig = (preset?.config as ThemeConfig) ?? ({} as ThemeConfig);
+    themeConfig = (invitation.themeOverrides && Object.keys(invitation.themeOverrides).length > 0)
+      ? { ...baseConfig, ...(invitation.themeOverrides as Partial<ThemeConfig>) } as ThemeConfig
+      : baseConfig;
+  }
 
   return {
     slug: invitation.slug,
@@ -89,17 +95,16 @@ export async function buildPublicViewModel(invitation: Invitation): Promise<Invi
     wishes: wishes.map(w => ({
       name: w.name,
       message: w.message,
-      createdAt: w.createdAt,
+      createdAt: w.createdAt.toISOString(),
     })),
     settings: {
-      music: { enabled: (invitation.settings as Record<string, unknown>)?.music ? ((invitation.settings as Record<string, Record<string, unknown>>).music?.enabled as boolean) ?? false : false },
-      showCountdown: true,
-      showStory: true,
-      showGallery: true,
-      showGift: true,
-      showRsvp: true,
-      showWishes: true,
-      ...((invitation.settings as Record<string, unknown>) || {}),
-    } as InvitationPublicVM['settings'],
+      music: { enabled: Boolean((invitation.settings as any)?.music?.enabled) },
+      showCountdown: Boolean((invitation.settings as unknown as Record<string, unknown> | undefined)?.showCountdown ?? true),
+      showStory: Boolean((invitation.settings as unknown as Record<string, unknown> | undefined)?.showStory ?? true),
+      showGallery: Boolean((invitation.settings as unknown as Record<string, unknown> | undefined)?.showGallery ?? true),
+      showGift: Boolean((invitation.settings as unknown as Record<string, unknown> | undefined)?.showGift ?? true),
+      showRsvp: Boolean((invitation.settings as unknown as Record<string, unknown> | undefined)?.showRsvp ?? true),
+      showWishes: Boolean((invitation.settings as unknown as Record<string, unknown> | undefined)?.showWishes ?? true),
+    } as unknown as InvitationPublicVM['settings'],
   };
 }

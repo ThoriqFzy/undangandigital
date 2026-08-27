@@ -13,7 +13,7 @@ interface Props {
 }
 
 const { invitation } = Astro.props;
-const cssVars = themeToCSSVars({});
+const cssVars = themeToCSSVars(invitation.theme.config ?? {} as any);
 ---
 
 <BaseLayout

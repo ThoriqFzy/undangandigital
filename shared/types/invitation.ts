@@ -26,16 +26,16 @@ export interface Invitation {
 }
 
 export interface InvitationSettings {
-  music: {
-    enabled: boolean;
+  music?: {
+    enabled?: boolean;
     assetId?: string;
   };
-  showCountdown: boolean;
-  showStory: boolean;
-  showGallery: boolean;
-  showGift: boolean;
-  showRsvp: boolean;
-  showWishes: boolean;
+  showCountdown?: boolean;
+  showStory?: boolean;
+  showGallery?: boolean;
+  showGift?: boolean;
+  showRsvp?: boolean;
+  showWishes?: boolean;
 }
 
 export interface ThemeOverrides {

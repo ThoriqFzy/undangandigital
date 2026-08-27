@@ -18,10 +18,11 @@
     "test:run": "vitest run",
     "lint": "astro check",
     "typecheck": "tsc --noEmit",
-    "deploy": "wrangler pages deploy dist/ --project-name=wedding-platform",
-    "deploy:preview": "wrangler pages deploy dist/ --project-name=wedding-platform --branch=preview",
+    "deploy": "wrangler pages deploy dist/client --project-name=wedding-platform --branch=main",
+    "deploy:preview": "wrangler pages deploy dist/client --project-name=wedding-platform --branch=preview",
     "setup-env": "bash scripts/setup-env.sh",
-    "pages:deploy": "npm run build && CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN} wrangler pages deploy dist/client --project-name=wedding-platform --branch=main"
+    "pages:deploy": "npm run build && wrangler pages deploy dist/client --project-name=wedding-platform --branch=main",
+    "ci:deploy": "npm run typecheck && npm run test:run && npm run build && wrangler pages deploy dist/client --project-name=wedding-platform --branch=main"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.2.5",
@@ -47,5 +48,8 @@
     "typescript": "^5.7.0",
     "vitest": "^3.0.0",
     "wrangler": "^4.0.0"
+  },
+  "overrides": {
+    "esbuild": "^0.25.0"
   }
 }

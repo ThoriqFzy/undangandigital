@@ -1,3 +1,5 @@
+/// <reference path="../.astro/types.d.ts" />
+
 import { defineMiddleware } from "astro:middleware";
 import { getCurrentUser } from "@backend/auth/config";
 

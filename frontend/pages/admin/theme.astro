@@ -57,10 +57,14 @@ const allThemes = await db.select().from(themes).orderBy(desc(themes.createdAt))
 
           {/* Actions */}
           <div class="flex gap-2">
-            <button class="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" disabled>
+            <button
+              type="button"
+              class="apply-theme-btn flex-1 rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100"
+              data-theme-id={theme.id}
+            >
               Pilih
             </button>
-            <a href={`/admin/theme/${theme.id}/edit`} class="rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100">
+            <a href={`/admin/theme/${theme.id}/edit`} class="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
               Edit
             </a>
           </div>
@@ -80,3 +84,28 @@ const allThemes = await db.select().from(themes).orderBy(desc(themes.createdAt))
     </a>
   </div>
 </AdminLayout>
+
+<script>
+  document.querySelectorAll('.apply-theme-btn')?.forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const themeId = (btn as HTMLButtonElement).dataset.themeId;
+      if (!themeId) return;
+      const invitationId = new URLSearchParams(window.location.search).get('invitationId');
+      const body: Record<string, unknown> = {};
+      if (invitationId) body.invitationId = invitationId;
+      const res = await fetch('/api/admin/theme/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...body, themeId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        alert('Tema diterapkan ke ' + (data?.data?.count ?? 0) + ' undangan.');
+        window.location.reload();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        alert('Gagal menerapkan tema: ' + (err?.error?.message || res.status));
+      }
+    });
+  });
+</script>

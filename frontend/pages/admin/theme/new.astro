@@ -1,0 +1,123 @@
+---
+/**
+ * THEME CREATE — New global theme preset
+ */
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import PageHeader from '../../../components/admin/PageHeader.astro';
+
+const defaultConfig = {
+  colors: { primary: '#4f46e5', secondary: '#0ea5e9', accent: '#f43f5e', background: '#ffffff', surface: '#f8fafc', text: '#1f2937' },
+  typography: { heading: 'Playfair Display', body: 'Inter' },
+  buttons: { radius: '0.75rem' },
+  animation: { intensity: 'medium' },
+};
+const colors = defaultConfig.colors;
+const typography = defaultConfig.typography;
+---
+
+<AdminLayout title="Buat Tema" activePage="theme">
+  <PageHeader title="Buat Tema Baru" subtitle="Atur warna, tipografi, dan gaya tombol undangan." />
+
+  <div class="grid gap-6 lg:grid-cols-[1fr_320px]">
+    <form id="theme-form" class="space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm" data-theme-id="">
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label class="block">
+          <span class="text-sm font-medium text-gray-700">Nama Tema</span>
+          <input name="name" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Elegant Gold" />
+        </label>
+        <label class="block">
+          <span class="text-sm font-medium text-gray-700">Slug</span>
+          <input name="slug" required pattern="[a-z0-9-]+" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="elegant-gold" />
+        </label>
+      </div>
+
+      <label class="block">
+        <span class="text-sm font-medium text-gray-700">Deskripsi</span>
+        <textarea name="description" rows="2" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Tema elegan dengan aksen emas"></textarea>
+      </label>
+
+      <div>
+        <p class="mb-2 text-sm font-semibold text-gray-900">Warna</p>
+        <div class="grid gap-4 sm:grid-cols-3">
+          <label class="block"><span class="text-xs text-gray-500">Primary</span><input type="color" name="color_primary" value={colors.primary} class="mt-1 h-10 w-full rounded-lg border border-gray-300" /></label>
+          <label class="block"><span class="text-xs text-gray-500">Secondary</span><input type="color" name="color_secondary" value={colors.secondary} class="mt-1 h-10 w-full rounded-lg border border-gray-300" /></label>
+          <label class="block"><span class="text-xs text-gray-500">Accent</span><input type="color" name="color_accent" value={colors.accent} class="mt-1 h-10 w-full rounded-lg border border-gray-300" /></label>
+          <label class="block"><span class="text-xs text-gray-500">Background</span><input type="color" name="color_background" value={colors.background} class="mt-1 h-10 w-full rounded-lg border border-gray-300" /></label>
+          <label class="block"><span class="text-xs text-gray-500">Surface</span><input type="color" name="color_surface" value={colors.surface} class="mt-1 h-10 w-full rounded-lg border border-gray-300" /></label>
+          <label class="block"><span class="text-xs text-gray-500">Text</span><input type="color" name="color_text" value={colors.text} class="mt-1 h-10 w-full rounded-lg border border-gray-300" /></label>
+        </div>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label class="block"><span class="text-sm font-medium text-gray-700">Font Heading</span><input name="typography_heading" value={typography.heading} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
+        <label class="block"><span class="text-sm font-medium text-gray-700">Font Body</span><input name="typography_body" value={typography.body} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
+        <label class="block"><span class="text-sm font-medium text-gray-700">Radius Tombol</span><input name="buttons_radius" value={defaultConfig.buttons.radius} class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
+        <label class="block"><span class="text-sm font-medium text-gray-700">Intensitas Animasi</span><select name="animation_intensity" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></label>
+      </div>
+
+      <div class="flex gap-3">
+        <button type="submit" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Buat Tema</button>
+        <a href="/admin/theme" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</a>
+      </div>
+    </form>
+
+    <aside class="space-y-4">
+      <p class="text-sm font-semibold text-gray-900">Pratinjau</p>
+      <div id="theme-preview" class="rounded-xl border border-gray-200 p-6 shadow-sm" style={`background:${colors.background};color:${colors.text}`}>
+        <h3 class="text-2xl font-bold" style={`color:${colors.primary}`}>Nama Mempelai</h3>
+        <p class="mt-1 text-sm" style={`color:${colors.secondary}`}>The Wedding of</p>
+        <button class="mt-4 px-4 py-2 text-sm font-medium text-white" style={`background:${colors.primary};border-radius:${defaultConfig.buttons.radius}`}>RSVP Sekarang</button>
+      </div>
+    </aside>
+  </div>
+</AdminLayout>
+
+<script>
+  const form = document.getElementById('theme-form') as HTMLFormElement | null;
+  const preview = document.getElementById('theme-preview');
+
+  function collect() {
+    const data = new FormData(form!);
+    const c = (n: string) => (data.get(n) as string) || '#000000';
+    return {
+      name: data.get('name'),
+      slug: data.get('slug'),
+      description: data.get('description'),
+      config: {
+        colors: { primary: c('color_primary'), secondary: c('color_secondary'), accent: c('color_accent'), background: c('color_background'), surface: c('color_surface'), text: c('color_text') },
+        typography: { heading: data.get('typography_heading') || 'Playfair Display', body: data.get('typography_body') || 'Inter' },
+        buttons: { radius: data.get('buttons_radius') || '0.75rem' },
+        animation: { intensity: data.get('animation_intensity') || 'medium' },
+      },
+    };
+  }
+
+  function render() {
+    if (!preview) return;
+    const v = collect();
+    const col = v.config.colors as any;
+    preview.style.background = col.background;
+    preview.style.color = col.text;
+    const h = preview.querySelector('h3') as HTMLElement | null;
+    if (h) h.style.color = col.primary;
+    const p = preview.querySelector('p') as HTMLElement | null;
+    if (p) p.style.color = col.secondary;
+    const btn = preview.querySelector('button') as HTMLElement | null;
+    if (btn) { btn.style.background = col.primary; btn.style.borderRadius = v.config.buttons.radius; }
+  }
+
+  form?.querySelectorAll('input,select').forEach((el) => el.addEventListener('input', render));
+  render();
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const res = await fetch('/api/admin/themes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(collect()),
+    });
+    if (res.ok) window.location.href = '/admin/theme';
+    else { const err = await res.json().catch(() => ({})); alert('Gagal menyimpan: ' + (err?.error?.message || res.status)); }
+  });
+</script>
