@@ -8,6 +8,13 @@
       "when": 1787762468019,
       "tag": "0000_glamorous_hydra",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787831255709,
+      "tag": "0001_add_auth_1_7_columns",
+      "breakpoints": true
     }
   ]
 }

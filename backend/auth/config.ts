@@ -46,6 +46,13 @@ export const auth = betterAuth({
       // No additional fields needed beyond Better Auth defaults
     },
   },
+  // Database uses UUID primary keys (uuid().defaultRandom()). Let the DB generate
+  // ids instead of Better Auth's default cuid generator, which Postgres rejects
+  // with "string_to_uuid" (22P02) on uuid columns. `advanced.database.generateId`
+  // is supported at runtime but not in the v1.7.1 type definitions.
+  advanced: {
+    database: { generateId: false },
+  } as any,
 });
 
 /**

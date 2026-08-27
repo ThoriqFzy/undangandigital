@@ -30,6 +30,8 @@ export const accounts = pgTable('accounts', {
     .references(() => users.id, { onDelete: 'cascade' }),
   accountId: varchar('account_id', { length: 255 }).notNull(),
   providerId: varchar('provider_id', { length: 255 }).notNull(),
+  // Better Auth 1.7: scopes account identity by issuer (e.g. "credential").
+  issuer: varchar('issuer', { length: 255 }),
   accessToken: text('access_token'),
   refreshToken: text('refresh_token'),
   accessTokenExpiresAt: timestamp('access_token_expires_at', { withTimezone: true }),
@@ -63,6 +65,9 @@ export const verifications = pgTable('verifications', {
   id: uuid('id').primaryKey().defaultRandom(),
   identifier: varchar('identifier', { length: 255 }).notNull(),
   value: varchar('value', { length: 255 }).notNull(),
+  // Better Auth 1.7 new columns
+  issuer: varchar('issuer', { length: 255 }),
+  encryptedData: text('encrypted_data'),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
