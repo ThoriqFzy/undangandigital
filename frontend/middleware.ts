@@ -49,7 +49,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length === 1 && !RESERVED_ROOT_SEGMENTS.has(segments[0])) {
     const slug = segments[0];
-    return context.redirect(`/m/${slug}`);
+    return new Response(null, {
+      status: 302,
+      headers: { location: `/m/${slug}` },
+    });
   }
 
   return next();
