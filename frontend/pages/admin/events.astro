@@ -7,8 +7,9 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 import PageHeader from '../../components/admin/PageHeader.astro';
 import { db } from '@db/client';
 import { events, invitations } from '@db/index';
-import { eq, asc } from 'drizzle-orm';
+import { eq, and, isNull, asc } from 'drizzle-orm';
 
+const ownerId = Astro.locals.adminUser!.id;
 const allEvents = await db
   .select({
     id: events.id,
@@ -22,6 +23,7 @@ const allEvents = await db
   })
   .from(events)
   .leftJoin(invitations, eq(events.invitationId, invitations.id))
+  .where(and(eq(invitations.ownerId, ownerId), isNull(invitations.deletedAt)))
   .orderBy(asc(events.eventDate));
 
 const typeLabels: Record<string, string> = {

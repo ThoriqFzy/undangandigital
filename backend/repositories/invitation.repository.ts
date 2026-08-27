@@ -7,7 +7,7 @@
 
 import { db } from '../db/client';
 import { invitations, templates, themes, couples, events, stories, assets, galleryItems, gifts, guests, wishes } from '../db/index';
-import { eq, and, isNull, desc, asc, count } from 'drizzle-orm';
+import { eq, and, isNull, desc, asc, count, ne } from 'drizzle-orm';
 import type { InvitationStatus } from '../../shared/constants/enum-values';
 
 export const invitationRepository = {

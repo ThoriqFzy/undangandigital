@@ -1,15 +1,22 @@
 /**
  * ADMIN API: Media upload
  * POST — Upload file to R2 + create asset record
+ * Auth: Required + ownership verified via invitationId
  */
 
-import type { APIRoute } from 'astro';
-import { uploadService } from '@backend/media/upload.service';
-import { successResponse, errorResponse } from '@lib/response';
-import { AppError } from '@lib/errors';
+import type { APIRoute } from "astro";
+import { uploadService } from "@backend/media/upload.service";
+import { successResponse, errorResponse } from "@lib/response";
+import { AppError } from "@lib/errors";
+import { getAdminUserId } from "@backend/middleware/admin-auth";
+import { requireInvitationOwnership } from "@backend/middleware/owner-check.middleware";
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
+    // Authentication
+    const userId = await getAdminUserId(request);
+
+    // Parse form data
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const invitationId = formData.get("invitationId") as string | null;
@@ -22,6 +29,9 @@ export const POST: APIRoute = async ({ request }) => {
     if (!invitationId) {
       return errorResponse("VALIDATION_ERROR", "invitationId wajib diisi", 400);
     }
+
+    // Ownership check — verify user owns this invitation
+    await requireInvitationOwnership(invitationId, userId);
 
     const result = await uploadService.uploadFile({
       file,

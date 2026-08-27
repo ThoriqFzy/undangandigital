@@ -28,13 +28,15 @@ Buka Cloudflare Dashboard → Pages → wedding-platform → Settings → Enviro
 
 | Variable | Value |
 |----------|-------|
-| DATABASE_URL | postgresql://neondb_owner:npg_6WvVPi5BDgZX@ep-fancy-wildflower-azc6xewt-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require |
+| DATABASE_URL | postgresql://neondb_owner:***@ep-fancy-wildflower-azc6xewt-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require |
 | BETTER_AUTH_SECRET | (generate random 32 char string) |
-| R2_ACCOUNT_ID | 7b26172684c33525f7b82045f20893e0 |
-| R2_ACCESS_KEY_ID | 12879ef9b3a11cebb894855db10f33e6 |
-| R2_SECRET_ACCESS_KEY | e01f5ff10f1d99fed309c3ba73585b41c2d7e617e80fea6c3c2cdcb8e1930e9d |
+| R2_ACCOUNT_ID | (your Cloudflare Account ID) |
+| R2_ACCESS_KEY_ID | (your R2 API Token Access Key ID) |
+| R2_SECRET_ACCESS_KEY | (your R2 API Token Secret Access Key) |
 | R2_BUCKET_NAME | wedding-assets |
 | PUBLIC_SITE_URL | (URL dari Cloudflare Pages, contoh: https://wedding-platform.pages.dev) |
+
+> **⚠️ SECURITY**: Jangan pernah commit credential asli ke repository. Gunakan Cloudflare Pages **Encrypted Environment Variables** (Settings → Environment variables → Add → "Encrypt"). R2 credentials dibuat via Cloudflare Dashboard → R2 → Manage R2 API Tokens → Create API Token (Object Read & Write permission).
 
 ### Step 4: Custom Domain (Optional)
 Cloudflare Dashboard → Pages → wedding-platform → Custom domains → Add domain

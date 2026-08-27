@@ -51,15 +51,15 @@ export const giftRepository = {
   async create(data: {
     invitationId: string;
     type: 'bank' | 'ewallet' | 'address' | 'other';
-    label?: string;
-    bankName?: string;
-    accountNumber?: string;
-    accountHolder?: string;
-    ewalletProvider?: string;
-    ewalletNumber?: string;
-    recipientName?: string;
-    address?: string;
-    instructions?: string;
+    label?: string | null;
+    bankName?: string | null;
+    accountNumber?: string | null;
+    accountHolder?: string | null;
+    ewalletProvider?: string | null;
+    ewalletNumber?: string | null;
+    recipientName?: string | null;
+    address?: string | null;
+    instructions?: string | null;
     sortOrder?: number;
     isVisible?: boolean;
   }) {

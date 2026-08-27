@@ -13,12 +13,27 @@ import { db } from '@db/client';
 import { invitations, guests, rsvps, wishes } from '@db/index';
 import { count, eq, and, isNull } from 'drizzle-orm';
 
-const [invCount] = await db.select({ count: count() }).from(invitations).where(isNull(invitations.deletedAt));
-const [guestCount] = await db.select({ count: count() }).from(guests).where(isNull(guests.deletedAt));
-const [rsvpAttending] = await db.select({ count: count() }).from(rsvps).where(eq(rsvps.status, 'attending'));
-const [rsvpDeclined] = await db.select({ count: count() }).from(rsvps).where(eq(rsvps.status, 'not_attending'));
-const [wishCount] = await db.select({ count: count() }).from(wishes).where(isNull(wishes.deletedAt));
-const [wishPending] = await db.select({ count: count() }).from(wishes).where(eq(wishes.status, 'pending'));
+const ownerId = Astro.locals.adminUser!.id;
+const ownerInvitations = and(eq(invitations.ownerId, ownerId), isNull(invitations.deletedAt));
+
+const [invCount] = await db.select({ count: count() }).from(invitations).where(ownerInvitations);
+const [guestCount] = await db.select({ count: count() }).from(guests)
+  .innerJoin(invitations, eq(guests.invitationId, invitations.id))
+  .where(and(ownerInvitations, isNull(guests.deletedAt)));
+const [rsvpAttending] = await db.select({ count: count() }).from(rsvps)
+  .innerJoin(guests, eq(rsvps.guestId, guests.id))
+  .innerJoin(invitations, eq(guests.invitationId, invitations.id))
+  .where(and(ownerInvitations, eq(rsvps.status, 'attending')));
+const [rsvpDeclined] = await db.select({ count: count() }).from(rsvps)
+  .innerJoin(guests, eq(rsvps.guestId, guests.id))
+  .innerJoin(invitations, eq(guests.invitationId, invitations.id))
+  .where(and(ownerInvitations, eq(rsvps.status, 'not_attending')));
+const [wishCount] = await db.select({ count: count() }).from(wishes)
+  .innerJoin(invitations, eq(wishes.invitationId, invitations.id))
+  .where(and(ownerInvitations, isNull(wishes.deletedAt)));
+const [wishPending] = await db.select({ count: count() }).from(wishes)
+  .innerJoin(invitations, eq(wishes.invitationId, invitations.id))
+  .where(and(ownerInvitations, isNull(wishes.deletedAt), eq(wishes.status, 'pending')));
 ---
 
 <AdminLayout title="Dashboard" activePage="dashboard">

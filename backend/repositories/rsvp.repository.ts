@@ -40,7 +40,7 @@ export const rsvpRepository = {
     guestId: string;
     status: 'attending' | 'not_attending' | 'maybe';
     guestCount?: number;
-    message?: string;
+    message?: string | null;
   }) {
     const existing = await this.findByGuestId(data.guestId);
 

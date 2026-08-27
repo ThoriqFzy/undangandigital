@@ -83,9 +83,9 @@ BETTER_AUTH_SECRET=random-secret
 BETTER_AUTH_URL=http://localhost:4321
 
 # Cloudflare R2
-R2_ACCOUNT_ID=...
-R2_ACCESS_KEY_ID=...
-R2_SECRET_ACCESS_KEY=...
+R2_ACCOUNT_ID=<your-account-id>
+R2_ACCESS_KEY_ID=<your-r2-api-token-key-id>
+R2_SECRET_ACCESS_KEY=<your-r2-api-token-secret>
 R2_BUCKET_NAME=wedding-assets
 
 # App

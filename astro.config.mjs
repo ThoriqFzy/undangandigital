@@ -5,7 +5,6 @@ import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
 import path from 'path';
 
-// https://astro.build/config
 export default defineConfig({
   srcDir: './frontend',
   output: 'server',

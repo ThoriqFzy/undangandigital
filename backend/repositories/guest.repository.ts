@@ -92,11 +92,11 @@ export const guestRepository = {
   async create(data: {
     invitationId: string;
     name: string;
-    phone?: string;
-    email?: string;
-    guestGroup?: string;
+    phone?: string | null;
+    email?: string | null;
+    guestGroup?: string | null;
     maxGuestCount?: number;
-    notes?: string;
+    notes?: string | null;
   }) {
     const rows = await db.insert(guests).values(data).returning();
     return rows[0];
@@ -108,9 +108,9 @@ export const guestRepository = {
   async createMany(data: Array<{
     invitationId: string;
     name: string;
-    phone?: string;
-    email?: string;
-    guestGroup?: string;
+    phone?: string | null;
+    email?: string | null;
+    guestGroup?: string | null;
     maxGuestCount?: number;
   }>) {
     return db.insert(guests).values(data).returning();

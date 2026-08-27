@@ -1,0 +1,82 @@
+---
+/**
+ * THEME CUSTOMIZATION PAGE — Admin
+ * Customize invitation theme colors, fonts, etc.
+ */
+
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import PageHeader from '../../components/admin/PageHeader.astro';
+import { db } from '@db/client';
+import { themes } from '@db/index';
+import { desc } from 'drizzle-orm';
+
+// Theme catalogue is global/read-only; frontend/middleware.ts requires a session.
+const allThemes = await db.select().from(themes).orderBy(desc(themes.createdAt));
+---
+
+<AdminLayout title="Tema" activePage="theme">
+  <PageHeader title="Kustomisasi Tema" subtitle={`${allThemes.length} tema tersedia`} />
+
+  {/* Theme selector */}
+  <div class="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {allThemes.map(theme => {
+      const config = theme.config as Record<string, unknown>;
+      const colors = (config.colors || {}) as Record<string, string>;
+      const typography = (config.typography || {}) as Record<string, string>;
+      
+      return (
+        <div class={`relative rounded-xl border p-4 shadow-sm transition-all ${
+          theme.slug === 'classic' ? 'border-indigo-300 bg-indigo-50' : 'border-gray-200 bg-white hover:border-gray-300'
+        }`}>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">{theme.name}</h3>
+            <span class={`text-xs font-medium px-2 py-0.5 rounded-full ${
+              theme.slug === 'classic' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-700'
+            }`}>
+              {theme.slug === 'classic' ? 'Default' : 'Tersedia'}
+            </span>
+          </div>
+          
+          {theme.description && (
+            <p class="text-sm text-gray-600 mb-4">{theme.description}</p>
+          )}
+
+          {/* Color preview from config JSONB */}
+          <div class="mb-4 flex gap-1">
+            <div class="h-4 w-4 rounded" style={`background: ${colors.primary || '#4f46e5'}`} title="Primary" />
+            <div class="h-4 w-4 rounded" style={`background: ${colors.secondary || '#0ea5e9'}`} title="Secondary" />
+            <div class="h-4 w-4 rounded" style={`background: ${colors.accent || '#f43f5e'}`} title="Accent" />
+            <div class="h-4 w-4 rounded" style={`background: ${colors.background || '#ffffff'}`} title="Background" />
+            <div class="h-4 w-4 rounded" style={`background: ${colors.text || '#1f2937'}`} title="Text" />
+          </div>
+
+          {/* Font preview from config JSONB */}
+          <div class="mb-4 text-xs text-gray-500">
+            <p>Font: <span class="font-medium">{typography.heading || 'Playfair Display'}</span> / <span class="font-medium">{typography.body || 'Inter'}</span></p>
+          </div>
+
+          {/* Actions */}
+          <div class="flex gap-2">
+            <button class="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" disabled>
+              Pilih
+            </button>
+            <a href={`/admin/theme/${theme.id}/edit`} class="rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100">
+              Edit
+            </a>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+
+  {/* Create new theme */}
+  <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
+    <p class="text-sm text-gray-600 mb-3">Belum menemukan tema yang cocok?</p>
+    <a href="/admin/theme/new" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      Buat Tema Baru
+    </a>
+  </div>
+</AdminLayout>

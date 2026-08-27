@@ -16,7 +16,7 @@ import { getAdminUserId } from '@backend/middleware/admin-auth';
 // Auth: get real user ID from session
 // (moved to inside each handler)
 
-export const GET: APIRoute = async ({ url }) => {
+export const GET: APIRoute = async ({ request, url }) => {
   try {
     const invitationId = url.searchParams.get('invitationId');
     if (!invitationId) return errorResponse('VALIDATION_ERROR', 'invitationId wajib diisi', 400);

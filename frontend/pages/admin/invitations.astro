@@ -7,8 +7,9 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 import PageHeader from '../../components/admin/PageHeader.astro';
 import { db } from '@db/client';
 import { invitations, templates, themes } from '@db/index';
-import { eq, isNull, desc } from 'drizzle-orm';
+import { eq, and, isNull, desc } from 'drizzle-orm';
 
+const ownerId = Astro.locals.adminUser!.id;
 const allInvitations = await db
   .select({
     id: invitations.id,
@@ -23,7 +24,7 @@ const allInvitations = await db
   .from(invitations)
   .leftJoin(templates, eq(invitations.templateId, templates.id))
   .leftJoin(themes, eq(invitations.themeId, themes.id))
-  .where(isNull(invitations.deletedAt))
+  .where(and(eq(invitations.ownerId, ownerId), isNull(invitations.deletedAt)))
   .orderBy(desc(invitations.createdAt));
 
 const statusColors: Record<string, string> = {

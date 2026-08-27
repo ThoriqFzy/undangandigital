@@ -16,7 +16,7 @@ import { getAdminUserId } from '@backend/middleware/admin-auth';
 // Auth: get real user ID from session
 // (moved to inside each handler)
 
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   try {
     if (!params.id) return errorResponse('VALIDATION_ERROR', 'ID wajib diisi', 400);
     const invitation = await invitationService.getAdminById(params.id, await getAdminUserId(request));
@@ -39,7 +39,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ params }) => {
+export const DELETE: APIRoute = async ({ params, request }) => {
   try {
     if (!params.id) return errorResponse('VALIDATION_ERROR', 'ID wajib diisi', 400);
     await invitationService.softDelete(params.id, await getAdminUserId(request));

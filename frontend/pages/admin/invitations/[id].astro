@@ -6,13 +6,14 @@
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { db } from '@db/client';
 import { invitations, couples, events, stories, gifts, guests } from '@db/index';
-import { eq, isNull, count as drizzleCount, asc } from 'drizzle-orm';
+import { and, eq, isNull, count as drizzleCount } from 'drizzle-orm';
 
+const ownerId = Astro.locals.adminUser!.id;
 const { id } = Astro.params;
 if (!id) return Astro.redirect('/admin/invitations');
 
 const invitation = await db.query.invitations.findFirst({
-  where: eq(invitations.id, id),
+  where: and(eq(invitations.id, id), eq(invitations.ownerId, ownerId), isNull(invitations.deletedAt)),
   with: { template: true, theme: true, couple: true },
 });
 
@@ -21,13 +22,7 @@ if (!invitation) return Astro.redirect('/admin/invitations');
 const [eventCount] = await db.select({ count: drizzleCount() }).from(events).where(eq(events.invitationId, id));
 const [storyCount] = await db.select({ count: drizzleCount() }).from(stories).where(eq(stories.invitationId, id));
 const [giftCount] = await db.select({ count: drizzleCount() }).from(gifts).where(eq(gifts.invitationId, id));
-const [guestCountResult] = await db.select({ count: drizzleCount() }).from(guests).where(and_(eq(guests.invitationId, id), isNull(guests.deletedAt)));
-
-// Helper for drizzle and
-function and_(...conditions: any[]) {
-  const { and } = require('drizzle-orm');
-  return and(...conditions);
-}
+const [guestCountResult] = await db.select({ count: drizzleCount() }).from(guests).where(and(eq(guests.invitationId, id), isNull(guests.deletedAt)));
 
 const statusColors: Record<string, string> = {
   draft: 'bg-gray-100 text-gray-700',

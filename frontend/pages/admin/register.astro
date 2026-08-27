@@ -6,6 +6,12 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import RegisterForm from '../../components/admin/RegisterForm.tsx';
 import { getCurrentUser } from '../../../backend/auth/config';
+import { isPublicRegistrationAllowed } from '../../../backend/auth/registration-policy';
+
+// Self-service registration is opt-in and disabled by default.
+if (!isPublicRegistrationAllowed()) {
+  return Astro.redirect('/admin/login');
+}
 
 // Redirect if already logged in
 const user = await getCurrentUser(Astro.request);

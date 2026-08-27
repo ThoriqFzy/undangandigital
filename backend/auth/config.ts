@@ -13,6 +13,7 @@ import {
   sessions,
   verifications,
 } from "../db/schema/auth";
+import { isPublicRegistrationAllowed } from "./registration-policy";
 
 /**
  * Better Auth instance.
@@ -33,7 +34,6 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    autoSelect: false,
     requireEmailVerification: false, // Set true when email is configured
     minPasswordLength: 8,
   },
@@ -45,9 +45,6 @@ export const auth = betterAuth({
     additionalFields: {
       // No additional fields needed beyond Better Auth defaults
     },
-  },
-  advanced: {
-    generateId: () => crypto.randomUUID(),
   },
 });
 

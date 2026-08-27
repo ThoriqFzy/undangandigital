@@ -16,7 +16,7 @@ import { getAdminUserId } from '@backend/middleware/admin-auth';
 // Auth: get real user ID from session
 // (moved to inside each handler)
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ request }) => {
   try {
     const invitations = await invitationService.listByOwner(await getAdminUserId(request));
     return successResponse(invitations);

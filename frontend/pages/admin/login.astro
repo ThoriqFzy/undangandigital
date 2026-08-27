@@ -6,6 +6,9 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import LoginForm from '../../components/admin/LoginForm.tsx';
 import { getCurrentUser } from '../../../backend/auth/config';
+import { isPublicRegistrationAllowed } from '../../../backend/auth/registration-policy';
+
+const registrationOpen = isPublicRegistrationAllowed();
 
 // Redirect to dashboard if already logged in
 const user = await getCurrentUser(Astro.request);
@@ -29,11 +32,12 @@ if (user) {
         <LoginForm client:load />
       </div>
 
-      {/* Register link */}
-      <p class="mt-4 text-center text-sm text-gray-500">
-        Belum punya akun?
-        <a href="/admin/register" class="font-medium text-indigo-600 hover:text-indigo-700"> Daftar</a>
-      </p>
+      {registrationOpen && (
+        <p class="mt-4 text-center text-sm text-gray-500">
+          Belum punya akun?
+          <a href="/admin/register" class="font-medium text-indigo-600 hover:text-indigo-700"> Daftar</a>
+        </p>
+      )}
     </div>
   </div>
 </BaseLayout>
