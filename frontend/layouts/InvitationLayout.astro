@@ -7,6 +7,7 @@
 import BaseLayout from './BaseLayout.astro';
 import type { InvitationPublicVM } from '../../backend/viewmodels/types';
 import { themeToCSSVars, defaultClassicTheme, themeConfigToCSSVars } from '../../templates/classic/theme-config';
+import OpeningSequence from '../components/invitation/OpeningSequence.tsx';
 
 interface Props {
   invitation: InvitationPublicVM;
@@ -14,6 +15,11 @@ interface Props {
 
 const { invitation } = Astro.props;
 const cssVars = themeConfigToCSSVars(invitation.theme?.config ?? {});
+
+// Extract opening config from settings & theme
+const openingSettings = invitation.settings?.opening || {};
+const themeOpening = invitation.theme?.config?.opening || {};
+const assetBaseUrl = import.meta.env.PUBLIC_R2_PUBLIC_URL || '';
 ---
 
 <BaseLayout
@@ -24,6 +30,15 @@ const cssVars = themeConfigToCSSVars(invitation.theme?.config ?? {});
     class="invitation-shell"
     style={Object.entries(cssVars).map(([k, v]) => `${k}:${v}`).join(';')}
   >
+    <!-- Opening Animation Sequence -->
+    <OpeningSequence
+      client:load
+      slug={invitation.slug}
+      themeOpening={themeOpening}
+      settings={openingSettings}
+      onOpen={() => {}}
+      assetBaseUrl={assetBaseUrl}
+    />
     <slot />
   </div>
 </BaseLayout>

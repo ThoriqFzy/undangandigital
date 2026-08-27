@@ -30,6 +30,15 @@ export interface InvitationSettings {
     enabled?: boolean;
     assetId?: string;
   };
+  opening?: {
+    enabled?: boolean;
+    buttonText?: string;
+    duration?: number;
+    wayangAssetId?: string;
+    pepohonanAssetId?: string;
+    rumahAssetId?: string;
+    couplePhotoAssetId?: string;
+  };
   showCountdown?: boolean;
   showStory?: boolean;
   showGallery?: boolean;
@@ -107,5 +116,12 @@ export interface ThemeConfig {
   };
   animation: {
     intensity: 'low' | 'medium' | 'high';
+  };
+  opening?: {
+    wayangAssetId?: string;
+    pepohonanAssetId?: string;
+    rumahAssetId?: string;
+    defaultButtonText?: string;
+    defaultDuration?: number;
   };
 }
