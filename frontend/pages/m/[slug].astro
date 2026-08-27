@@ -24,6 +24,7 @@ import { storyRepository } from '@repos/story.repository';
 import { giftRepository } from '@repos/gift.repository';
 import { wishRepository } from '@repos/wish.repository';
 import { galleryRepository } from '@repos/gallery.repository';
+import { buildPublicViewModel } from '@backend/viewmodels/invitation-public.vm';
 
 const { slug } = Astro.params;
 
@@ -38,7 +39,10 @@ try {
   return Astro.redirect('/');
 }
 
-// Fetch related data
+// Build the public view model (resolves theme config from DB, settings, etc.)
+const vm = await buildPublicViewModel(invitation);
+
+// Fetch related data (kept for component props that expect raw rows)
 const [couple, events, stories, gifts, wishes, galleryItems] = await Promise.all([
   coupleRepository.findByInvitationId(invitation.id),
   eventRepository.findVisible(invitation.id),
@@ -55,15 +59,15 @@ const guestId = Astro.url.searchParams.get('guest') || undefined;
 // Get first event date for countdown
 const firstEventDate = events.length > 0 ? events[0].eventDate : new Date().toISOString().split('T')[0];
 
-// Settings
-const settings = (invitation.settings || {}) as Record<string, unknown>;
+// Settings (from VM so theme overrides/DB settings apply)
+const settings = vm.settings;
 ---
 
 <InvitationLayout invitation={{
   slug: invitation.slug,
   title: invitation.title,
   template: { slug: 'classic', name: 'Classic', config: {} },
-  theme: { config: (invitation.theme && invitation.theme.config) ? invitation.theme.config : ({} as any) },
+  theme: { config: vm.theme.config },
   couple: couple ? {
     groomName: couple.groomName,
     groomNickname: couple.groomNickname,
@@ -85,7 +89,7 @@ const settings = (invitation.settings || {}) as Record<string, unknown>;
   gallery: [],
   gifts: [],
   wishes: [],
-  settings: { music: { enabled: false }, showCountdown: true, showStory: true, showGallery: true, showGift: true, showRsvp: true, showWishes: true },
+  settings: vm.settings,
 }}>
   {/* COVER */}
   <Cover
